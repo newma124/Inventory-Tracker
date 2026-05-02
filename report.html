@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Inventory Report{% endblock %}
+{% block content %}
+<div class="card">
+  <form class="row" method="get" style="gap:8px; align-items:flex-end">
+    <div>
+      <label for="category_id">Category</label>
+      <select id="category_id" name="category_id">
+        <option value="">All</option>
+        {% for c in cats %}
+          <option value="{{c.id}}" {% if cat_id and c.id == cat_id|int %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="location_id">Location</label>
+      <select id="location_id" name="location_id">
+        <option value="">All</option>
+        {% for l in locs %}
+          <option value="{{l.id}}" {% if loc_id and l.id == loc_id|int %}selected{% endif %}>{{ l.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="status_id">Status</label>
+      <select id="status_id" name="status_id">
+        <option value="">Any</option>
+        {% for s in statuses %}
+          <option value="{{ s.id }}" {% if status_id and s.id == status_id|int %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="start">Purchased After</label>
+      <input id="start" name="start" type="date" value="{{ start or '' }}">
+    </div>
+    <div>
+      <label for="end">Purchased Before</label>
+      <input id="end" name="end" type="date" value="{{ end or '' }}">
+    </div>
+
+    <div>
+      <button class="btn" type="submit">Run</button>
+    </div>
+  </form>
+</div>
+
+<div class="grid" style="margin-top:12px">
+  <div class="card">
+    <div class="stats">
+      <span class="chip">Total Qty: {{ total_qty }}</span>
+      <span class="chip">Total Value: ${{ '%.2f' % total_value }}</span>
+      <span class="chip">Avg Unit $: ${{ '%.2f' % avg_unit_cost }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    {% if rows %}
+      <table>
+        <thead><tr><th>Name</th><th>Category</th><th>Location</th><th>Status</th><th>Condition</th><th>Qty</th><th>Unit $</th></tr></thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>{{ r.name }}</td>
+              <td>{{ r.category.name }}</td>
+              <td>{{ r.location.name }}</td>
+              <td>{{ r.status.name }}</td>
+              <td>{{ r.condition.name }}</td>
+              <td>{{ r.quantity }}</td>
+              <td>{{ '%.2f' % (r.unit_cost or 0) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">No results for the selected filters.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

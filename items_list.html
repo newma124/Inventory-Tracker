@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block content %}
+
+  <div class="card">
+    <form class="row" action="{{ url_for('list_items') }}" method="get" style="gap:8px; align-items:flex-end">
+      <div>
+        <label for="item_id">Item ID</label>
+        <input id="item_id" name="item_id" type="text" value="{{ item_id or '' }}" placeholder="e.g., 42">
+      </div>
+
+      <div style="min-width:240px">
+        <label for="q">Search (name/notes)</label>
+        <input id="q" name="q" type="text" value="{{ q or '' }}" placeholder="USB-C, screwdriver, etc.">
+      </div>
+
+      <div>
+        <label for="condition_id">Condition</label>
+        <select id="condition_id" name="condition_id">
+          <option value="">Any</option>
+          {% for c in conditions %}
+            <option value="{{ c.id }}" {% if condition_id and c.id == condition_id|int %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id">
+          <option value="">All</option>
+          {% for c in cats %}
+            <option value="{{ c.id }}" {% if category_id and c.id == category_id|int %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="location_id">Location</label>
+        <select id="location_id" name="location_id">
+          <option value="">All</option>
+          {% for l in locs %}
+            <option value="{{ l.id }}" {% if location_id and l.id == location_id|int %}selected{% endif %}>{{ l.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="status_id">Status</label>
+        <select id="status_id" name="status_id">
+          <option value="">Any</option>
+          {% for s in statuses %}
+            <option value="{{ s.id }}" {% if status_id and s.id == status_id|int %}selected{% endif %}>{{ s.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="price_min">Price min ($)</label>
+        <input id="price_min" name="price_min" type="number" step="0.01" min="0" value="{{ price_min or '' }}">
+      </div>
+      <div>
+        <label for="price_max">Price max ($)</label>
+        <input id="price_max" name="price_max" type="number" step="0.01" min="0" value="{{ price_max or '' }}">
+      </div>
+
+      <div>
+        <label for="sort_by">Sort by</label>
+        <select id="sort_by" name="sort_by">
+          <option value="created_desc" {% if sort_by=='created_desc' %}selected{% endif %}>Newest</option>
+          <option value="name_asc" {% if sort_by=='name_asc' %}selected{% endif %}>Name A→Z</option>
+          <option value="name_desc" {% if sort_by=='name_desc' %}selected{% endif %}>Name Z→A</option>
+          <option value="price_asc" {% if sort_by=='price_asc' %}selected{% endif %}>Price Low→High</option>
+          <option value="price_desc" {% if sort_by=='price_desc' %}selected{% endif %}>Price High→Low</option>
+        </select>
+      </div>
+
+      <div>
+        <button class="btn" type="submit">Apply</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="stats">
+        <span class="chip">Items: {{ total_items }}</span>
+        <span class="chip">Total Qty: {{ total_quantity }}</span>
+        <span class="chip">Value: ${{ '%.2f' % total_value }}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      {% if items %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>Category</th><th>Location</th>
+            <th>Qty</th><th>Unit $</th><th>Condition</th><th>Status</th>
+            <th class="right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in items %}
+          <tr>
+            <td>{{ it.id }}</td>
+            <td><a href="{{ url_for('show_item', item_id=it.id) }}">{{ it.name }}</a></td>
+            <td>{{ it.category.name }}</td>
+            <td>{{ it.location.name }}</td>
+            <td>{{ it.quantity }}</td>
+            <td>{{ '%.2f' % (it.unit_cost or 0) }}</td>
+            <td>{{ it.condition.name }}</td>
+            <td>{{ it.status.name }}</td>
+            <td class="right">
+              <a class="btn secondary" href="{{ url_for('edit_item', item_id=it.id) }}">Edit</a>
+              <form style="display:inline" method="post" action="{{ url_for('delete_item', item_id=it.id) }}" onsubmit="return confirm('Delete this item?')">
+                <button class="btn danger" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="muted">No inventory yet. Add your first item!</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
