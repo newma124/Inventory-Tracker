@@ -64,6 +64,15 @@ cd inventory-tracker
 
 ### 1b. Create a folder called "templates" and place all the .html files in it. 
 
+```
+templates/
+  base.html
+  item_detail.html
+  item_form.html
+  items_list.html
+  report.html
+```
+
 ### 2. Create a virtual environment
 
 ```bash
