@@ -62,6 +62,8 @@ git clone https://github.com/newma124/inventory-tracker.git
 cd inventory-tracker
 ```
 
+### 1b. Create a folder called "templates" and place all the .html files in it. 
+
 ### 2. Create a virtual environment
 
 ```bash
